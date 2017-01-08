@@ -1,4 +1,4 @@
-# ui-rev
+# uirev
 
 ## Overview
 [Uirev](https://github.com/jefrydco/uirev) is a painless front-end boilerplate kit. It can make your developing experience more easy and fast.
