@@ -1,7 +1,7 @@
 {
   "name": "uirev",
   "version": "0.0.1",
-  "description": "A Painless Frontend Starter Kit",
+  "description": "A Painless Frontend Boilerplate Kit",
   "main": "gulpfile.js",
   "scripts": {
     "serve": "gulp",

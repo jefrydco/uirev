@@ -149,7 +149,7 @@ gulp.task('pug', function () {
         .pipe(browserSync.stream())
 })
 
-// SCSS Build
+// Scss Build
 gulp.task('scss-build', function () {
     return gulp.src(src.sassSourceBuild)
         .pipe(sourcemaps.init())
@@ -167,7 +167,7 @@ gulp.task('scss-build', function () {
         .pipe(browserSync.stream())
 })
 
-// SCSS Dev Vendor
+// Scss Dev Vendor
 gulp.task('scss-dev-vendor', function () {
     return gulp.src(src.sassSourceDevVendor)
         .pipe(sourcemaps.init())
@@ -177,7 +177,7 @@ gulp.task('scss-dev-vendor', function () {
         .pipe(gulp.dest(dist.cssDist))
 })
 
-// SCSS Dev
+// Scss Dev
 gulp.task('scss-dev', ['scss-dev-vendor'], function () {
     return gulp.src(src.sassSourceDev)
         .pipe(sourcemaps.init())
