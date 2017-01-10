@@ -4,16 +4,12 @@
 const   autoprefixer        = require('gulp-autoprefixer'),
         babel               = require('gulp-babel'),
         browserSync         = require('browser-sync').create(),
-        cache               = require('gulp-cache'),
         clean               = require('gulp-clean'),
         concatJS            = require('gulp-concat'),
         gulp                = require('gulp'),
         imagemin            = require('gulp-imagemin'),
-        imageminGiflosy     = require('imagemin-giflossy'),
-        imageminJpgtran     = require('imagemin-jpegtran'),
-        imageminPngquant    = require('imagemin-pngquant'),
-        imageminSvgo        = require('imagemin-svgo'),
         minifyCSS           = require('gulp-clean-css'),
+        plumber             = require('gulp-plumber'),
         pug                 = require('gulp-pug'),
         rename              = require('gulp-rename'),
         scss                = require('gulp-sass'),
@@ -40,12 +36,14 @@ const src = {
     pugSource: './src/pug/index.pug',
     sassSourceBuild: [
         './src/assets/scss/vendor/bootstrap.scss',
+        './src/assets/scss/vendor/font-awesome.scss',
         './src/assets/scss/animate.scss',
         './src/assets/scss/main.scss'
     ],
     sassSourceDev: './src/assets/scss/main.scss',
     sassSourceDevVendor: [
         './src/assets/scss/vendor/bootstrap.scss',
+        './src/assets/scss/vendor/font-awesome.scss',
         './src/assets/scss/animate.scss'
     ]
 }
@@ -59,27 +57,24 @@ const dist = {
     jsDist: './dist/assets/js',
 }
 
-//  Plugins for processing image
-const plugins = [
-    imageminGiflosy({
-        lossy: 80
-    }),
-    imageminJpgtran({
-        progressive: true
-    }),
-    imageminPngquant({
-        quality: '65 - 80'
-    }),
-    imageminSvgo({
-        removeViewBox: false
-    })
-]
-
 // Source for watch files
 const srcWatch = [
     './src/assets/js/**/*.js',
     './src/pug/**/*.pug',
     './src/assets/scss/**/*.scss'
+]
+
+// Plugins config for imagemin
+const pluginsImagemin = [
+    imagemin.optipng({
+        optiomizationLevel: 7
+    }),
+    imagemin.jpegtran({
+        arithmetic: true
+    }),
+    imagemin.gifsicle({
+        optiomizationLevel: 3
+    })
 ]
 
 // Font
@@ -91,17 +86,19 @@ gulp.task('font', function () {
 // Image
 gulp.task('img', function () {
     return gulp.src(src.imgSource)
-        .pipe(cache(imagemin({
-            interlaced: true,
-            progressive: true,
-            use: plugins
-        })))
+        .pipe(plumber())
+        .pipe(imagemin({
+            verbose: true,
+            use: pluginsImagemin
+        }))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.imgDist))
 })
 
 // JS Build
 gulp.task('js-build', function () {
     return gulp.src(src.jsSourceBuild)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: ['es2015']
@@ -109,6 +106,7 @@ gulp.task('js-build', function () {
         .pipe(uglify())
         .pipe(concatJS('main.min.js', {newLine: '\n\n\n'}))
         .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.jsDist))
         .pipe(browserSync.stream())
 })
@@ -116,12 +114,14 @@ gulp.task('js-build', function () {
 // JS Dev Vendor
 gulp.task('js-dev-vendor', function () {
     return gulp.src(src.jsSourceDevVendor)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: ['es2015']
         }))
         .pipe(concatJS('vendor.js', {newLine: '\n\n\n'}))
         .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.jsDist))
         .pipe(browserSync.stream())
 })
@@ -129,12 +129,14 @@ gulp.task('js-dev-vendor', function () {
 // JS Dev
 gulp.task('js-dev', ['js-dev-vendor'],function () {
     return gulp.src(src.jsSourceDev)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: ['es2015']
         }))
         .pipe(concatJS('main.js', {newLine: '\n\n\n'}))
         .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.jsDist))
         .pipe(browserSync.stream())
 })
@@ -142,9 +144,11 @@ gulp.task('js-dev', ['js-dev-vendor'],function () {
 // Pug
 gulp.task('pug', function () {
     return gulp.src(src.pugSource)
+        .pipe(plumber())
         .pipe(pug({
             pretty: true
         }))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.htmlDist))
         .pipe(browserSync.stream())
 })
@@ -152,6 +156,7 @@ gulp.task('pug', function () {
 // Scss Build
 gulp.task('scss-build', function () {
     return gulp.src(src.sassSourceBuild)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(scss().on('error', scss.logError))
         .pipe(autoprefixer())
@@ -163,6 +168,7 @@ gulp.task('scss-build', function () {
             suffix: '.min'
         }))
         .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.cssDist))
         .pipe(browserSync.stream())
 })
@@ -170,20 +176,24 @@ gulp.task('scss-build', function () {
 // Scss Dev Vendor
 gulp.task('scss-dev-vendor', function () {
     return gulp.src(src.sassSourceDevVendor)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(scss().on('error', scss.logError))
         .pipe(autoprefixer())
         .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.cssDist))
 })
 
 // Scss Dev
 gulp.task('scss-dev', ['scss-dev-vendor'], function () {
     return gulp.src(src.sassSourceDev)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(scss().on('error', scss.logError))
         .pipe(autoprefixer())
         .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
         .pipe(gulp.dest(dist.cssDist))
         .pipe(browserSync.stream())
 })
