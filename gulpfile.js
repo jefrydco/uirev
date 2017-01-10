@@ -174,7 +174,7 @@ gulp.task('scss-build', function () {
 })
 
 // Scss Dev Vendor
-gulp.task('scss-dev-vendor', function () {
+gulp.task('scss-dev-vendor', ['font'], function () {
     return gulp.src(src.sassSourceDevVendor)
         .pipe(plumber())
         .pipe(sourcemaps.init())
