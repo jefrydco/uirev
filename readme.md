@@ -17,7 +17,5 @@ Make sure you have installed **node.js** on your computer. [Download](https://gi
 
 To change between developing and production environment, take a look in `src/pug/_env.pug`. The default configuration is developing environment but you set it **true** if you wanna use production environment.
 
-After that, take a look in `src/assets/scss/main.scss`, uncomment several lines of code (3 - 26) to switch into production environment.
-
 ### License
 The content of this project itself is licensed under the [Creative Commons Attribution 3.0 license](http://creativecommons.org/licenses/by/3.0/us/deed.en_US), and the underlying source code used to format and display that content is licensed under the [MIT license](https://github.com/jefrydco/uirev/blob/master/LICENSE).
