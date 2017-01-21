@@ -5,10 +5,12 @@ const   autoprefixer        = require('gulp-autoprefixer'),
         babel               = require('gulp-babel'),
         browserSync         = require('browser-sync').create(),
         clean               = require('gulp-clean'),
-        concatJS            = require('gulp-concat'),
+        concat              = require('gulp-concat'),
         gulp                = require('gulp'),
         imagemin            = require('gulp-imagemin'),
-        minifyCSS           = require('gulp-clean-css'),
+        imageResize         = require('gulp-image-resize'),
+        mediaQueries        = require('gulp-group-css-media-queries'),
+        cssnano             = require('gulp-cssnano'),
         plumber             = require('gulp-plumber'),
         pug                 = require('gulp-pug'),
         rename              = require('gulp-rename'),
@@ -17,219 +19,319 @@ const   autoprefixer        = require('gulp-autoprefixer'),
         uglify              = require('gulp-uglify')
 
 //  Source path
+const pathSrc = {
+    fonts           : './src/assets/scss/fonts/',
+    img             : './src/assets/img/',
+    js              : './src/assets/js/',
+    jsVendor        : './src/assets/js/vendor/',
+    scss            : './src/assets/scss/',
+    scssVendor      : './src/assets/scss/vendor/',
+    pug             : './src/pug/'
+}
+
+// Dist path
+const pathDist = './dist/assets/'
+
+// Source
 const src = {
-    fontSource: './src/assets/scss/fonts/*',
-    imgSource: './src/assets/img/*',
-    jsSourceBuild: [
-        './src/assets/js/vendor/jquery.min.js',
-        './src/assets/js/vendor/bootstrap.min.js',
-        './src/assets/js/main.js'
-    ],
-    jsSourceDev: [
-        './src/assets/js/main.js',
-        '!./src/assets/vendor/*.js'
-    ],
-    jsSourceDevVendor: [
-        './src/assets/js/vendor/jquery.min.js',
-        './src/assets/js/vendor/bootstrap.min.js'
-    ],
-    pugSource: './src/pug/index.pug',
-    sassSourceBuild: [
-        './src/assets/scss/vendor/bootstrap.scss',
-        './src/assets/scss/vendor/font-awesome.scss',
-        './src/assets/scss/animate.scss',
-        './src/assets/scss/main.scss'
-    ],
-    sassSourceDev: './src/assets/scss/main.scss',
-    sassSourceDevVendor: [
-        './src/assets/scss/vendor/bootstrap.scss',
-        './src/assets/scss/vendor/font-awesome.scss',
-        './src/assets/scss/animate.scss'
-    ]
+    fonts: pathSrc.fonts + '*',
+    img: {
+        hd: pathSrc.img + 'hd/**/*',
+        md: pathSrc.img + 'md/**/*',
+        sm: pathSrc.img + 'sm/**/*'
+    },
+    js: {
+        vendorCopy: pathSrc.jsVendor + 'copy/**/*.js',
+        devVendor: [
+            '!' + pathSrc.jsVendor + 'copy/**/*.js',
+            pathSrc.jsVendor + 'jquery.js',
+            pathSrc.jsVendor + 'jquery.easing.js',
+            pathSrc.jsVendor + 'bootstrap.js',
+            pathSrc.jsVendor + 'bootstrap.smartmenus.js',
+        ],
+        dev: [
+            '!' + pathSrc.jsVendor + '**/*.js',
+            pathSrc.js + 'main.js'
+        ],
+        build: [
+            '!' + pathSrc.jsVendor + 'copy/**/*.js',
+            pathSrc.jsVendor + 'jquery.js',
+            pathSrc.jsVendor + 'jquery.easing.js',
+            pathSrc.jsVendor + 'bootstrap.js',
+            pathSrc.jsVendor + 'bootstrap.smartmenus.js',
+            pathSrc.js + 'main.js'
+        ]
+    },
+    scss: {
+        devVendor: [
+            pathSrc.scssVendor + 'bootstrap.scss',
+            pathSrc.scssVendor + 'bootstrap.smartmenus.scss',
+            pathSrc.scssVendor + 'font-awesome.scss',
+            pathSrc.scssVendor + 'animate.scss'
+        ],
+        dev: pathSrc.scss + 'main.scss',
+        buildVendor: [
+            pathSrc.scssVendor + 'bootstrap.scss',
+            pathSrc.scssVendor + 'bootstrap.smartmenus.scss',
+            pathSrc.scssVendor + 'font-awesome.scss',
+            pathSrc.scssVendor + 'animate.scss'
+        ],
+        build: [
+            pathSrc.scss + 'main.scss',
+            // pathSrc.scssVendor + ''
+        ]
+    },
+    pug: pathSrc.pug + 'index.pug'
 }
 
-//  Destionation path
+// Dist
 const dist = {
-    fontDist: './dist/assets/fonts',
-    cssDist: './dist/assets/css',
-    htmlDist: './dist',
-    imgDist: './dist/assets/img',
-    jsDist: './dist/assets/js',
+    fonts: pathDist + 'fonts',
+    img: pathDist + 'img',
+    js: pathDist + 'js',
+    img: {
+        hd: pathDist + 'img/hd',
+        md: pathDist + 'img/md',
+        sm: pathDist + 'img/sm'
+    },
+    scss: pathDist + 'css',
+    pug: './dist'
 }
 
-// Source for watch files
-const srcWatch = [
-    './src/assets/js/**/*.js',
-    './src/pug/**/*.pug',
-    './src/assets/scss/**/*.scss'
-]
+// Watch source
+const srcWatch = {
+    js: pathSrc.js + '**/*.js',
+    scss: pathSrc.scss + '**/*.scss',
+    pug: pathSrc.pug + '**/*.pug'
+}
 
-// Plugins config for imagemin
-const pluginsImagemin = [
+// Plugin config for imagemin
+const plugImagemin = [
     imagemin.optipng({
-        optiomizationLevel: 7
+        optimizationLevel: 7
     }),
     imagemin.jpegtran({
         arithmetic: true
     }),
     imagemin.gifsicle({
-        optiomizationLevel: 3
+        optimizationLevel: 3
     })
 ]
 
-// Font
-gulp.task('font', function () {
-    return gulp.src(src.fontSource)
-        .pipe(gulp.dest(dist.fontDist))
+// Fonts
+gulp.task('fonts', () => {
+    return gulp.src(src.fonts)
+        .pipe(gulp.dest(dist.fonts))
 })
 
-// Image
-gulp.task('img', function () {
-    return gulp.src(src.imgSource)
+// Image HD
+gulp.task('img:hd', () => {
+    return gulp.src(src.img.hd)
+        .pipe(plumber())
+        .pipe(imageResize({
+            width: 1920,
+            format: 'jpg',
+            upscale: true
+        }))
+        .pipe(imagemin({
+            progressive: true,
+            verbose: true,
+            use: plugImagemin
+        }))
+        .pipe(plumber.stop())
+        .pipe(gulp.dest(dist.img.hd))
+})
+
+// Image Medium
+gulp.task('img:md', () => {
+    return gulp.src(src.img.md)
+        .pipe(plumber())
+        .pipe(imageResize({
+            width: 1366,
+            format: 'jpg',
+            upscale: true
+        }))
+        .pipe(imagemin({
+            progressive: true,
+            verbose: true,
+            use: plugImagemin
+        }))
+        .pipe(plumber.stop())
+        .pipe(gulp.dest(dist.img.md))
+})
+
+// Image Scale
+gulp.task('img:sm', () => {
+    return gulp.src(src.img.sm)
         .pipe(plumber())
         .pipe(imagemin({
+            progressive: true,
             verbose: true,
-            use: pluginsImagemin
+            use: plugImagemin
         }))
         .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.imgDist))
+        .pipe(gulp.dest(dist.img.sm))
 })
 
-// JS Build
-gulp.task('js-build', function () {
-    return gulp.src(src.jsSourceBuild)
+// Img
+gulp.task('img', ['img:hd', 'img:md', 'img:sm'])
+
+// Js Vendor Copy
+gulp.task('js:vendor-cp', () => {
+    return gulp.src(src.js.vendorCopy)
         .pipe(plumber())
         .pipe(sourcemaps.init())
-        .pipe(babel({
-            presets: ['es2015']
-        }))
-        .pipe(uglify())
-        .pipe(concatJS('main.min.js', {newLine: '\n\n\n'}))
         .pipe(sourcemaps.write('./maps'))
         .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.jsDist))
+        .pipe(gulp.dest(dist.js))
         .pipe(browserSync.stream())
 })
 
 // JS Dev Vendor
-gulp.task('js-dev-vendor', function () {
-    return gulp.src(src.jsSourceDevVendor)
+gulp.task('js:dev-vendor', () => {
+    return gulp.src(src.js.devVendor)
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: ['es2015']
         }))
-        .pipe(concatJS('vendor.js', {newLine: '\n\n\n'}))
+        .pipe(concat('vendor.js'))
         .pipe(sourcemaps.write('./maps'))
         .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.jsDist))
+        .pipe(gulp.dest(dist.js))
         .pipe(browserSync.stream())
 })
 
 // JS Dev
-gulp.task('js-dev', ['js-dev-vendor'],function () {
-    return gulp.src(src.jsSourceDev)
+gulp.task('js:dev', ['js:vendor-cp', 'js:dev-vendor'], () => {
+    return gulp.src(src.js.dev)
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
             presets: ['es2015']
         }))
-        .pipe(concatJS('main.js', {newLine: '\n\n\n'}))
+        .pipe(concat('main.js', {
+            newLine: '\n\n\n'
+        }))
         .pipe(sourcemaps.write('./maps'))
         .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.jsDist))
+        .pipe(gulp.dest(dist.js))
+        .pipe(browserSync.stream())
+})
+
+// JS Build
+gulp.task('js:build', ['js:vendor-cp'], () => {
+    return gulp.src(src.js.build)
+        .pipe(plumber())
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        .pipe(uglify())
+        .pipe(concat('vendor.min.js'))
+        .pipe(plumber.stop())
+        .pipe(gulp.dest(dist.js))
+})
+
+// SCSS Dev Vendor
+gulp.task('scss:dev-vendor', () => {
+    return gulp.src(src.scss.devVendor)
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(scss().on('error', scss.logError))
+        .pipe(autoprefixer())
+        .pipe(mediaQueries())
+        .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
+        .pipe(gulp.dest(dist.scss))
+        .pipe(browserSync.stream())
+})
+
+// SCSS Dev
+gulp.task('scss:dev', ['scss:dev-vendor'], () => {
+    return gulp.src(src.scss.dev)
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(scss().on('error', scss.logError))
+        .pipe(autoprefixer())
+        .pipe(mediaQueries())
+        .pipe(sourcemaps.write('./maps'))
+        .pipe(plumber.stop())
+        .pipe(gulp.dest(dist.scss))
+        .pipe(browserSync.stream())
+})
+
+// SCSS Build Vendor
+gulp.task('scss:build-vendor', () => {
+    return gulp.src(src.scss.buildVendor)
+        .pipe(plumber())
+        .pipe(scss().on('error', scss.logError))
+        .pipe(autoprefixer())
+        .pipe(mediaQueries())
+        .pipe(cssnano())
+        .pipe(concat('vendor.min.css'))
+        .pipe(plumber.stop())
+        .pipe(gulp.dest(dist.scss))
+        .pipe(browserSync.stream())
+})
+
+// SCSS Build
+gulp.task('scss:build', ['scss:build-vendor'], () => {
+    return gulp.src(src.scss.build)
+        .pipe(plumber())
+        .pipe(scss().on('error', scss.logError))
+        .pipe(autoprefixer())
+        .pipe(mediaQueries())
+        .pipe(cssnano())
+        .pipe(concat('main.min.css'))
+        .pipe(plumber.stop())
+        .pipe(gulp.dest(dist.scss))
         .pipe(browserSync.stream())
 })
 
 // Pug
-gulp.task('pug', function () {
-    return gulp.src(src.pugSource)
+gulp.task('pug', () => {
+    return gulp.src(src.pug)
         .pipe(plumber())
         .pipe(pug({
             pretty: true
         }))
         .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.htmlDist))
+        .pipe(gulp.dest(dist.pug))
         .pipe(browserSync.stream())
 })
 
-// Scss Build
-gulp.task('scss-build', function () {
-    return gulp.src(src.sassSourceBuild)
-        .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(scss().on('error', scss.logError))
-        .pipe(autoprefixer())
-        .pipe(minifyCSS({debug: true}, function (details) {
-            console.log('Original Size: ' + details.stats.originalSize)
-            console.log('Minified Size: ' + details.stats.minifiedSize)
-        }))
-        .pipe(rename({
-            suffix: '.min'
-        }))
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.cssDist))
-        .pipe(browserSync.stream())
-})
-
-// Scss Dev Vendor
-gulp.task('scss-dev-vendor', ['font'], function () {
-    return gulp.src(src.sassSourceDevVendor)
-        .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(scss().on('error', scss.logError))
-        .pipe(autoprefixer())
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.cssDist))
-})
-
-// Scss Dev
-gulp.task('scss-dev', ['scss-dev-vendor'], function () {
-    return gulp.src(src.sassSourceDev)
-        .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(scss().on('error', scss.logError))
-        .pipe(autoprefixer())
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(plumber.stop())
-        .pipe(gulp.dest(dist.cssDist))
-        .pipe(browserSync.stream())
-})
-
-// Clean dist directory
-gulp.task('clean', function () {
-    return gulp.src('dist')
+// Clean dist
+gulp.task('clean', () => {
+    return gulp.src('./dist')
         .pipe(clean())
 })
 
-// Create server for dev
-gulp.task('serve-dev', ['font', 'img', 'js-dev', 'pug', 'scss-dev'], function () {
+// Dev Server
+gulp.task('serve:dev', ['fonts', 'img', 'js:dev', 'scss:dev', 'pug'], () => {
     browserSync.init({
         notify: false,
         server: './dist'
     })
 
-    gulp.watch(srcWatch[0], ['js-dev'])
-    gulp.watch(srcWatch[1], ['pug'])
-    gulp.watch(srcWatch[2], ['scss-dev'])
+    gulp.watch(srcWatch.js, ['js:dev'])
+    gulp.watch(srcWatch.scss, ['scss:dev'])
+    gulp.watch(srcWatch.pug, ['pug'])
 })
 
-// Create server for build
-gulp.task('serve-build', ['font', 'img', 'js-build', 'pug', 'scss-build'], function () {
+// Build Server
+gulp.task('serve:build', ['fonts', 'img', 'js:build', 'scss:build', 'pug'], () => {
     browserSync.init({
         notify: false,
         server: './dist'
     })
 
-    gulp.watch(srcWatch[0], ['js-build'])
-    gulp.watch(srcWatch[1], ['pug'])
-    gulp.watch(srcWatch[2], ['scss-build'])
+    gulp.watch(srcWatch.js, ['js:build'])
+    gulp.watch(srcWatch.scss, ['scss:build'])
+    gulp.watch(srcWatch.pug, ['pug'])
 })
 
 // Default dev
-gulp.task('default', ['serve-dev'])
+gulp.task('default', ['serve:dev'])
 
-// Build production
-gulp.task('build', ['serve-build'])
+// Default Build
+gulp.task('build', ['serve:build'])

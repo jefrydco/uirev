@@ -1,6 +1,6 @@
 {
   "name": "uirev",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Painless Frontend Boilerplate Kit",
   "main": "gulpfile.js",
   "scripts": {
@@ -33,9 +33,11 @@
     "gulp-autoprefixer": "^3.1.1",
     "gulp-babel": "^6.1.2",
     "gulp-clean": "^0.3.2",
-    "gulp-clean-css": "^2.3.2",
     "gulp-concat": "^2.6.1",
     "gulp-concat-css": "^2.3.0",
+    "gulp-cssnano": "^2.1.2",
+    "gulp-group-css-media-queries": "^1.2.0",
+    "gulp-image-resize": "^0.11.0",
     "gulp-imagemin": "^3.1.1",
     "gulp-plumber": "^1.1.0",
     "gulp-pug": "^3.2.0",
