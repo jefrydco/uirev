@@ -160,7 +160,7 @@ gulp.task('img:md', () => {
         .pipe(gulp.dest(dist.img.md))
 })
 
-// Image Scale
+// Image Small
 gulp.task('img:sm', () => {
     return gulp.src(src.img.sm)
         .pipe(plumber())
