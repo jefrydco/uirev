@@ -18,7 +18,7 @@ Make sure you have installed **node.js** on your computer. [Download](https://gi
 the kit or clone this repository. Run `npm install` to make everything run smoothly. Then, build your project in `./src` directory.
 
 To change between developing and production environment, take a look in `./src/pug/_env.pug`.
-The default configuration is developing environment but you set it **true** if you wanna use production environment.
+The default configuration is **dev** environment but you set it **true** if you wanna use production environment.
 
 ### Available Command
 
@@ -26,8 +26,8 @@ The default configuration is developing environment but you set it **true** if y
 * `gulp fonts` to copy all fonts in `./src/assets/scss/fonts` to `./dist/assets/fonts`.
 
 #### Image
-* `gulp img:hd` to optimize and resize all images in `./src/assets/img/hd` to resolution 1920 x auto. It also convert them into .jpg format.Then copy the result to `./dist/assets/img/hd`.
-* `gulp img:md` to optimize and resize all images in `./src/assets/img/md` to resolution 1320 x auto. It also convert them into .jpg format. Then copy the result to `./dist/assets/img/md`.
+* `gulp img:hd` to optimize and resize all images in `./src/assets/img/hd` to resolution 1920 x auto. It also convert them into **.jpg** format.Then copy the result to `./dist/assets/img/hd`.
+* `gulp img:md` to optimize and resize all images in `./src/assets/img/md` to resolution 1320 x auto. It also convert them into **.jpg** format. Then copy the result to `./dist/assets/img/md`.
 * `gulp img:sm` to optimize all images in `./src/assets/img/sm` and copy the result to `./dist/assets/img/sm`. It doesn't resize and convert anything because I think small image usually used for background pattern, icon and logo.
 * `gulp img` to run all of img command above.
 
