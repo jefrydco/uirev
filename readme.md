@@ -26,25 +26,25 @@ The default configuration is **dev** environment but you set it **true** if you 
 * `gulp fonts` to copy all fonts in `./src/assets/scss/fonts` to `./dist/assets/fonts`.
 
 #### Image
-* `gulp img:hd` to optimize and resize all images in `./src/assets/img/hd` to resolution 1920 x auto. It also convert them into **.jpg** format. Then copy the result to `./dist/assets/img/hd`.
-* `gulp img:md` to optimize and resize all images in `./src/assets/img/md` to resolution 1320 x auto. It also convert them into **.jpg** format. Then copy the result to `./dist/assets/img/md`.
-* `gulp img:sm` to optimize all images in `./src/assets/img/sm` and copy the result to `./dist/assets/img/sm`. It doesn't resize and convert anything because I think small image usually used for background pattern, icon and logo.
+* `gulp img:hd` to optimize and resize all images in `./src/assets/img/hd` to resolution 1920 x auto. It also convert them into **.jpg** format.
+* `gulp img:md` has same functiont as `gulp img:hd` but the differences is it resize the image to resolution 1320 x auto.
+* `gulp img:sm` to optimize all images in `./src/assets/img/sm`. It doesn't resize and convert anything because I think small image usually used for background pattern, icon and logo.
 * `gulp img` to run all of img command above.
 
 #### JavaScript
 * `gulp js:vendor-cp` to copy all JS vendor assets in `./src/assets/js/vendor/cp` to `./dist/assets/js`.
-* `gulp js:dev-vendor` to convert all of vendor script into ECMAScript 5 then concat them into one file named **vendor.js** located in `./dist/assets/js`.
+* `gulp js:dev-vendor` to convert all of vendor script into ECMAScript 5 then concat them into one file named **vendor.js**.
 * `gulp js:dev` to convert **main.js** into ECMAScript 5 and it also run `js:vendor-cp` and `js:dev-vendor`.
-* `gulp js:build` to convert all of vendor script and your **main.js** into ECMAScript 5 and concat them into one file named **vendor.min.js** located in `./dist/assets/js`.
+* `gulp js:build` to convert all of vendor script and your **main.js** into ECMAScript 5 and concat them into one file named **vendor.min.js**.
 
 #### SCSS
 * `gulp scss:dev-vendor` to compile all SCSS vendor assets in `./src/assets/scss/vendor` to CSS files and place the output to `./dist/assets/css`. It also combine all separated media queries found in them.
-* `gulp scss:dev` to compile all SCSS Vendor assets and your custom stylesheet and place the output to `./dist/assets/css`.
-* `gulp scss:build-vendor`, it has same function as `gulp scss:dev-vendor` but the differences is it combine all SCSS files into one css file named **vendor.min.css** located in `./dist/assets/css`.
+* `gulp scss:dev` to compile all SCSS Vendor assets and your custom stylesheet.
+* `gulp scss:build-vendor`, it has same function as `gulp scss:dev-vendor` but the differences is it combine all SCSS files into one css file named **vendor.min.css**.
 * `gulp scss:build`, it has same function as `gulp scss:dev`.
 
 #### Pug
-* `gulp pug` to compile and combile all pug files in `./src/pug` into one file named **index.html** located in `./dist`.
+* `gulp pug` to compile and combile all pug files in `./src/pug` into one file named **index.html**.
 
 #### Helper
 * `npm run clean` or `gulp clean` to clean your **dist** project directory.
