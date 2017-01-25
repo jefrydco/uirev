@@ -46,6 +46,7 @@ const src = {
             '!' + pathSrc.jsVendor + 'copy/**/*.js',
             pathSrc.jsVendor + 'jquery.js',
             pathSrc.jsVendor + 'jquery.easing.js',
+            pathSrc.jsVendor + 'jquery.smartmenus.js',
             pathSrc.jsVendor + 'bootstrap.js',
             pathSrc.jsVendor + 'bootstrap.smartmenus.js',
         ],
@@ -57,6 +58,7 @@ const src = {
             '!' + pathSrc.jsVendor + 'copy/**/*.js',
             pathSrc.jsVendor + 'jquery.js',
             pathSrc.jsVendor + 'jquery.easing.js',
+            pathSrc.jsVendor + 'jquery.smartmenus.js',
             pathSrc.jsVendor + 'bootstrap.js',
             pathSrc.jsVendor + 'bootstrap.smartmenus.js',
             pathSrc.js + 'main.js'
