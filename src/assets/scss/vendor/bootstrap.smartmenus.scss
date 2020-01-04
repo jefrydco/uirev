@@ -1,153 +1,160 @@
-.navbar-nav {
-  &:not(.sm-collapsible) ul {
-    .caret {
-      position: absolute;
-      right: 0;
-      margin-top: 6px;
-      margin-right: 15px;
-      border-top: 4px solid transparent;
-      border-bottom: 4px solid transparent;
-      border-left: 4px dashed;
-    }
-    a.has-submenu {
-      padding-right: 30px;
-    }
-  }
-  &.sm-collapsible {
-    .caret, ul .caret {
-      position: absolute;
-      right: 0;
-      margin: -3px 15px 0 0;
-      padding: 0;
-      width: 32px;
-      height: 26px;
-      line-height: 24px;
-      text-align: center;
-      border-width: 1px;
-      border-style: solid;
-    }
-    .caret:before {
+/*
+ You probably do not need to edit this at all.
+
+ Add some SmartMenus required styles not covered in Bootstrap 4's default CSS.
+ These are theme independent and should work with any Bootstrap 4 theme mod.
+*/
+
+/* Carets in collapsible mode (make them look like +/- buttons) */
+
+.navbar-nav.sm-collapsible {
+  .sub-arrow {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    margin: -0.7em 0.5em 0 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: .25rem;
+    padding: 0;
+    width: 2em;
+    height: 1.4em;
+    font-size: 1.25rem;
+    line-height: 1.2em;
+    text-align: center;
+
+    &::before {
       content: '+';
-      font-family: monospace;
-      font-weight: bold;
-    }
-    .open > a > .caret:before {
-      content: '-';
-    }
-    a.has-submenu {
-      padding-right: 50px;
-    }
-    &[data-sm-skip-collapsible-behavior] {
-      .caret, ul .caret {
-        position: static;
-        margin: 0 0 0 2px;
-        padding: 0;
-        width: 0;
-        height: 0;
-        border-top: 4px dashed;
-        border-right: 4px solid transparent;
-        border-bottom: 0;
-        border-left: 4px solid transparent;
-      }
-      .caret:before {
-        content: '' !important;
-      }
-      a.has-submenu {
-        padding-right: 15px;
-      }
     }
   }
-  span {
-    &.scroll-up, &.scroll-down {
-      position: absolute;
-      display: none;
-      visibility: hidden;
-      height: 20px;
-      overflow: hidden;
-      text-align: center;
+
+  .show > a > .sub-arrow::before {
+    content: '-';
+  }
+}
+
+.navbar-dark .navbar-nav.sm-collapsible .nav-link .sub-arrow {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* make sure there's room for the carets */
+
+.navbar-nav {
+  &.sm-collapsible {
+    .has-submenu {
+      padding-right: 3em;
     }
-    &.scroll-up-arrow {
+
+    .nav-link, .dropdown-item {
+      position: relative;
+    }
+  }
+
+  &:not(.sm-collapsible) .nav-link .sub-arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: .255em;
+    vertical-align: .255em;
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-left: .3em solid transparent;
+  }
+}
+
+/* keep the carets properly positioned */
+
+/* Nav carets in expanded mode */
+
+/* point the arrows up for .fixed-bottom navbars */
+
+.fixed-bottom .navbar-nav:not(.sm-collapsible) {
+  .nav-link .sub-arrow, &:not([data-sm-skip]) .dropdown-toggle::after {
+    border-top: 0;
+    border-bottom: .3em solid;
+  }
+}
+
+/* Dropdown carets in expanded mode */
+
+.navbar-nav {
+  &:not(.sm-collapsible) {
+    .dropdown-item .sub-arrow, &:not([data-sm-skip]) .dropdown-menu .dropdown-toggle::after {
       position: absolute;
-      top: -2px;
-      left: 50%;
-      margin-left: -8px;
+      top: 50%;
+      right: 0;
       width: 0;
       height: 0;
-      overflow: hidden;
-      border-top: 7px dashed transparent;
-      border-right: 7px dashed transparent;
-      border-bottom: 7px solid;
-      border-left: 7px dashed transparent;
+      margin-top: -.3em;
+      margin-right: 1em;
+      border-top: .3em solid transparent;
+      border-bottom: .3em solid transparent;
+      border-left: .3em solid;
     }
-    &.scroll-down-arrow {
-      position: absolute;
-      top: -2px;
-      left: 50%;
-      margin-left: -8px;
-      width: 0;
-      height: 0;
-      overflow: hidden;
-      border-top: 7px dashed transparent;
-      border-right: 7px dashed transparent;
-      border-bottom: 7px solid;
-      border-left: 7px dashed transparent;
-      top: 6px;
-      border-top: 7px solid;
-      border-right: 7px dashed transparent;
-      border-bottom: 7px dashed transparent;
-      border-left: 7px dashed transparent;
+
+    .dropdown-item.has-submenu {
+      padding-right: 2em;
     }
   }
-  &.sm-collapsible ul {
-    .dropdown-menu {
-      > li > a, .dropdown-header {
-        padding-left: 35px;
-      }
-    }
-    ul {
-      .dropdown-menu {
-        > li > a, .dropdown-header {
-          padding-left: 45px;
-        }
-      }
-      ul {
-        .dropdown-menu {
-          > li > a, .dropdown-header {
-            padding-left: 55px;
-          }
-        }
-        ul .dropdown-menu {
-          > li > a, .dropdown-header {
-            padding-left: 65px;
-          }
-        }
-      }
-    }
+
+  .scroll-up, .scroll-down {
+    position: absolute;
+    display: none;
+    visibility: hidden;
+    height: 20px;
+    overflow: hidden;
+    text-align: center;
   }
-  .dropdown-menu > li > a {
+
+  .scroll-up-arrow {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    margin-left: -8px;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    border-top: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid;
+    border-left: 7px solid transparent;
+  }
+
+  .scroll-down-arrow {
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    margin-left: -8px;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    border-top: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid;
+    border-left: 7px solid transparent;
+    top: 6px;
+    border-top: 7px solid;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+    border-left: 7px solid transparent;
+  }
+
+  &.sm-collapsible .dropdown-menu .dropdown-menu {
+    margin: .5em;
+  }
+
+  &:not([data-sm-skip]) .dropdown-item {
     white-space: normal;
   }
-  ul.sm-nowrap > li > a {
+
+  &:not(.sm-collapsible) .sm-nowrap > li > .dropdown-item {
     white-space: nowrap;
   }
-  &.sm-collapsible ul.sm-nowrap > li > a {
-    white-space: normal;
-  }
 }
 
-/* make sub menu arrows look like +/- buttons in collapsible mode */
+/* make sure there's room for the carets */
 
-/* revert to Bootstrap's default carets in collapsible mode when the "data-sm-skip-collapsible-behavior" attribute is set to the ul.navbar-nav */
+/* Scrolling arrows for tall menus */
 
-/* scrolling arrows for tall menus */
+/* Add some spacing for 2+ level sub menus in collapsible mode */
 
-/* add more indentation for 2+ level sub in collapsible mode - Bootstrap normally supports just 1 level sub menus */
-
-/* fix SmartMenus sub menus auto width (subMenusMinWidth and subMenusMaxWidth options) */
-
-/* fix .navbar-right subs alignment */
-
-.navbar-right ul.dropdown-menu {
-  left: 0;
-  right: auto;
-}
+/* Fix SmartMenus sub menus auto width (subMenusMinWidth/subMenusMaxWidth options) */

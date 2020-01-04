@@ -176,7 +176,7 @@ gulp.task('img:sm', () => {
 })
 
 // Img
-gulp.task('img', ['img:hd', 'img:md', 'img:sm'])
+gulp.task('img', gulp.series('img:hd', 'img:md', 'img:sm'))
 
 // Js Vendor Copy
 gulp.task('js:vendor-cp', () => {
@@ -195,7 +195,7 @@ gulp.task('js:dev-vendor', () => {
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
-            presets: ['es2015']
+            presets: ['@babel/env']
         }))
         .pipe(concat('vendor.js'))
         .pipe(sourcemaps.write('./maps'))
@@ -205,12 +205,12 @@ gulp.task('js:dev-vendor', () => {
 })
 
 // JS Dev
-gulp.task('js:dev', ['js:vendor-cp', 'js:dev-vendor'], () => {
+gulp.task('js:dev', gulp.series('js:vendor-cp', 'js:dev-vendor', () => {
     return gulp.src(src.js.dev)
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(babel({
-            presets: ['es2015']
+            presets: ['@babel/env']
         }))
         .pipe(concat('main.js', {
             newLine: '\n\n\n'
@@ -219,20 +219,20 @@ gulp.task('js:dev', ['js:vendor-cp', 'js:dev-vendor'], () => {
         .pipe(plumber.stop())
         .pipe(gulp.dest(dist.js))
         .pipe(browserSync.stream())
-})
+}))
 
 // JS Build
-gulp.task('js:build', ['js:vendor-cp'], () => {
+gulp.task('js:build', gulp.series('js:vendor-cp', () => {
     return gulp.src(src.js.build)
         .pipe(plumber())
         .pipe(babel({
-            presets: ['es2015']
+            presets: ['@babel/env']
         }))
         .pipe(uglify())
         .pipe(concat('vendor.min.js'))
         .pipe(plumber.stop())
         .pipe(gulp.dest(dist.js))
-})
+}))
 
 // SCSS Dev Vendor
 gulp.task('scss:dev-vendor', () => {
@@ -249,7 +249,7 @@ gulp.task('scss:dev-vendor', () => {
 })
 
 // SCSS Dev
-gulp.task('scss:dev', ['scss:dev-vendor'], () => {
+gulp.task('scss:dev', gulp.series('scss:dev-vendor', () => {
     return gulp.src(src.scss.dev)
         .pipe(plumber())
         .pipe(sourcemaps.init())
@@ -260,7 +260,7 @@ gulp.task('scss:dev', ['scss:dev-vendor'], () => {
         .pipe(plumber.stop())
         .pipe(gulp.dest(dist.scss))
         .pipe(browserSync.stream())
-})
+}))
 
 // SCSS Build Vendor
 gulp.task('scss:build-vendor', () => {
@@ -277,7 +277,7 @@ gulp.task('scss:build-vendor', () => {
 })
 
 // SCSS Build
-gulp.task('scss:build', ['scss:build-vendor'], () => {
+gulp.task('scss:build', gulp.series('scss:build-vendor', () => {
     return gulp.src(src.scss.build)
         .pipe(plumber())
         .pipe(scss().on('error', scss.logError))
@@ -288,7 +288,7 @@ gulp.task('scss:build', ['scss:build-vendor'], () => {
         .pipe(plumber.stop())
         .pipe(gulp.dest(dist.scss))
         .pipe(browserSync.stream())
-})
+}))
 
 // Pug
 gulp.task('pug', () => {
@@ -309,31 +309,31 @@ gulp.task('clean', () => {
 })
 
 // Dev Server
-gulp.task('serve:dev', ['fonts', 'img', 'js:dev', 'scss:dev', 'pug'], () => {
+gulp.task('serve:dev', gulp.series('fonts', 'img', 'js:dev', 'scss:dev', 'pug', () => {
     browserSync.init({
         notify: false,
         server: './dist'
     })
 
-    gulp.watch(srcWatch.js, ['js:dev'])
-    gulp.watch(srcWatch.scss, ['scss:dev'])
-    gulp.watch(srcWatch.pug, ['pug'])
-})
+    gulp.watch(srcWatch.js, gulp.parallel('js:dev'))
+    gulp.watch(srcWatch.scss, gulp.parallel('scss:dev'))
+    gulp.watch(srcWatch.pug, gulp.parallel('pug'))
+}))
 
 // Build Server
-gulp.task('serve:build', ['fonts', 'img', 'js:build', 'scss:build', 'pug'], () => {
+gulp.task('serve:build', gulp.series('fonts', 'img', 'js:build', 'scss:build', 'pug', () => {
     browserSync.init({
         notify: false,
         server: './dist'
     })
 
-    gulp.watch(srcWatch.js, ['js:build'])
-    gulp.watch(srcWatch.scss, ['scss:build'])
-    gulp.watch(srcWatch.pug, ['pug'])
-})
+    gulp.watch(srcWatch.js, gulp.parallel('js:build'))
+    gulp.watch(srcWatch.scss, gulp.parallel('scss:build'))
+    gulp.watch(srcWatch.pug, gulp.parallel('pug'))
+}))
 
 // Default dev
-gulp.task('default', ['serve:dev'])
+gulp.task('default', gulp.series('serve:dev'))
 
 // Default Build
-gulp.task('build', ['serve:build'])
+gulp.task('build', gulp.series('serve:build'))

@@ -1,12 +1,7 @@
-// Contextual backgrounds
+// stylelint-disable declaration-no-important
 
-// [converter] $parent hack
-@mixin bg-variant($parent, $color) {
+@mixin bg-gradient-variant($parent, $color) {
   #{$parent} {
-    background-color: $color;
-  }
-  a#{$parent}:hover,
-  a#{$parent}:focus {
-    background-color: darken($color, 10%);
+    background: $color linear-gradient(180deg, mix($body-bg, $color, 15%), $color) repeat-x !important;
   }
 }
